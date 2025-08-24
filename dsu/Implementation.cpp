@@ -3,13 +3,14 @@ using namespace std;
 
 class DSU
 {
-    vector<int> rank, parent;
+    vector<int> parent, rank, size;
 
 public:
     DSU(int n)
     {
-        rank.resize(n + 1, 0);
         parent.resize(n + 1);
+        rank.resize(n + 1, 0);
+        size.resize(n + 1, 1);
         for (int i = 0; i <= n; i++)
         {
             parent[i] = i;
@@ -19,71 +20,72 @@ public:
     int findParent(int node)
     {
         if (node == parent[node])
-        {
             return node;
-        }
         return parent[node] = findParent(parent[node]);
     }
 
-    void unionByRank(int node1, int node2)
+    void unionByRank(int u, int v)
     {
-        int Unode1 = findParent(node1);
-        int Unode2 = findParent(node2);
+        int pu = findParent(u);
+        int pv = findParent(v);
 
-        if (Unode1 == Unode2)
-            return;
-
-        if (rank[Unode1] < rank[Unode2])
+        if (pu == pv)
+            return; 
+        if (rank[pu] < rank[pv])
         {
-            parent[Unode1] = Unode2;
+            parent[pu] = pv;
         }
-        else if (rank[Unode2] < rank[Unode1])
+        else if (rank[pv] < rank[pu])
         {
-            parent[Unode2] = Unode1;
+            parent[pv] = pu;
         }
         else
         {
-            parent[Unode2] = Unode1;
-            rank[Unode1]++;
+            parent[pv] = pu;
+            rank[pu]++;
+        }
+    }
+    void unionBySize(int u, int v)
+    {
+        int pu = findParent(u);
+        int pv = findParent(v);
+
+        if (pu == pv)
+            return;
+
+        if (size[pu] < size[pv])
+        {
+            parent[pu] = pv;
+            size[pv] += size[pu];
+        }
+        else
+        {
+            parent[pv] = pu;
+            size[pu] += size[pv];
         }
     }
 };
 
 int main()
 {
-    DSU dsu(7); 
+    DSU dsu(7);
+
     dsu.unionByRank(1, 2);
     dsu.unionByRank(2, 3);
-    dsu.unionByRank(4, 5);
-    dsu.unionByRank(6, 7);
-    dsu.unionByRank(5, 6);
 
-    if (dsu.findParent(3) == dsu.findParent(7))
-    {
-        cout << "3 and 7 are in the same component\n";
-    }
-    else
-    {
-        cout << "3 and 7 are in different components\n";
-    }
+    dsu.unionBySize(4, 5);
+    dsu.unionBySize(6, 7);
+    dsu.unionBySize(5, 6);
 
     if (dsu.findParent(1) == dsu.findParent(3))
-    {
-        cout << "1 and 3 are in the same component\n";
-    }
+        cout << "1 and 3 are in the same set (Rank)\n";
     else
-    {
-        cout << "1 and 3 are in different components\n";
-    }
+        cout << "1 and 3 are in different sets (Rank)\n";
 
     if (dsu.findParent(4) == dsu.findParent(7))
-    {
-        cout << "4 and 7 are in the same component\n";
-    }
+        cout << "4 and 7 are in the same set (Size)\n";
     else
-    {
-        cout << "4 and 7 are in different components\n";
-    }
+        cout << "4 and 7 are in different sets (Size)\n";
 
     return 0;
 }
