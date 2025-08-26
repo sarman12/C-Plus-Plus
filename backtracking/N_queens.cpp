@@ -64,7 +64,6 @@ int main(){
         int n;
         cin>>n;
         
-        // Solution ob;
         vector<vector<int>> ans =N_queens(n);
         if(ans.size() == 0)
             cout<<-1<<"\n";
